@@ -15,3 +15,23 @@ Prolog loadable files are not supported.
 
 ### `index.sense`
 An index for looking up synsets related to a specific synset.
+
+### Morphology Exception Lists
+* `noun.exc`
+* `verb.exc`
+* `adj.exc`
+* `adv.exc`
+
+### WordNet Database Files
+* `index.noun`
+* `data.noun`
+* `index.verb`
+* `data.verb`
+* `index.adj`
+* `data.adj`
+* `index.adv`
+* `data.adv`
+
+### illustrating Sentences For Verbs
+* `sentidx.vrb`
+* `sents.vrb`
