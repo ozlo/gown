@@ -23,22 +23,22 @@ synset containing the sense, and the number of times it has been tagged in the
 semantic concordance texts.
 */
 
-type senseIndex map[string][]senseIndexEntry
-type senseIndexEntry struct {
-    ss_type int             // POS tag. (e.g. POS_NOUN, ...)
-    lex_filenum int         // index into LEXOGRAPHER_FILE_NUM_TO_NAME
-    lex_id int              // identifies a sense within a lemma file (default is 0)
-    head_word string        // OPTIONAL lemma of the first word of the adjective satellite's head synset. (ss_type of this entry is 5)
-    head_id int             // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
+type senseIndex map[string][]SenseIndexEntry
+type SenseIndexEntry struct {
+    PartOfSpeech int       // POS tag. (e.g. POS_NOUN, ...)
+    LexographerFilenum int // index into LEXOGRAPHER_FILE_NUM_TO_NAME
+    LexId int              // identifies a sense within a lemma file (default is 0)
+    HeadWord string        // OPTIONAL lemma of the first word of the adjective satellite's head synset. (PartOfSpeech of this entry is 5)
+    HeadId int             // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
 
-    synset_offset int       // byte offset into <POS>.data file
-    sense_number int        // sense number within the <POS>.data for the word
-    tag_cnt int             // number of times the word was tagged in semantic concordance texts
+    SynsetOffset int       // byte offset into <POS>.data file
+    SenseNumber int        // sense number within the <POS>.data for the word
+    TagCount int           // number of times the word was tagged in semantic concordance texts
 }
 
-func (e *senseIndexEntry) ToString() string {
+func (e *SenseIndexEntry) ToString() string {
     var pos_str string
-    switch(e.ss_type) {
+    switch(e.PartOfSpeech) {
     case POS_UNSUPPORTED:
         pos_str = "UNSUPPORTED"
     case POS_NOUN:
@@ -55,13 +55,13 @@ func (e *senseIndexEntry) ToString() string {
 
     return fmt.Sprintf("{ %s, file: %s, lex_id: %d head: %s, head_id: %d, synset_offset: %d, sense_number: %d, tag_cnt: %d }",
         pos_str,
-        LEXOGRAPHER_FILE_NUM_TO_NAME[e.lex_filenum],
-        e.lex_id,
-        e.head_word,
-        e.head_id,
-        e.synset_offset,
-        e.sense_number,
-        e.tag_cnt)
+        LEXOGRAPHER_FILE_NUM_TO_NAME[e.LexographerFilenum],
+        e.LexId,
+        e.HeadWord,
+        e.HeadId,
+        e.SynsetOffset,
+        e.SenseNumber,
+        e.TagCount)
 }
 
 func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
@@ -103,7 +103,7 @@ func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
         head_word := lex_sense_fields[3]                    // OPTIONAL lemma of the first word of the adjective satellite's head synset. (ss_type of this entry is 5)
         head_id, _ := strconv.Atoi(lex_sense_fields[4])     // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
 
-        newEntry := senseIndexEntry {
+        newEntry := SenseIndexEntry {
             ss_type,
             lex_filenum,
             lex_id,
@@ -116,7 +116,7 @@ func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
 
         entries, exists := index[lemma]
         if !exists {
-            index[lemma] = make([]senseIndexEntry, 1)
+            index[lemma] = make([]SenseIndexEntry, 1)
             index[lemma][0] = newEntry
         } else {
             index[lemma] = append(entries, newEntry)

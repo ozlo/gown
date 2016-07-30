@@ -9,8 +9,6 @@ import (
 //var RELATIONSHIP_POINTER_SYMBOLS map[string]int
 
 var (
-    POS_FILE_NAMES = []string { "adj", "adv", "noun", "verb" }
-
     LEXOGRAPHER_FILE_NUM_TO_NAME = []string{
         "adj.all",            // all adjective clusters
         "adj.pert",           // relational adjectives (pertainyms)

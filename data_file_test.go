@@ -4,6 +4,10 @@ import (
     "testing"
 )
 
+var (
+    POS_FILE_NAMES = []string { "adj", "adv", "noun", "verb" }
+)
+
 func TestLoadPosIndex(t *testing.T) {
     for _, posName := range POS_FILE_NAMES {
         posIndexFilename := "./wn-dict/index."  + posName

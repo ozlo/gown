@@ -32,8 +32,8 @@ func TestLoadSenseIndex(t *testing.T) {
     actual_computer_files := map[string]int {}
     for _, lemma_index := range computerLemmas {
         //fmt.Printf("%s: %v %s\n", "computer", lemma_index, lemma_index.ToString())
-        actual_computer_pos[lemma_index.ss_type]++
-        actual_computer_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.lex_filenum]]++
+        actual_computer_pos[lemma_index.PartOfSpeech]++
+        actual_computer_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.LexographerFilenum]]++
     }
     validate_pos(t, "computer", expected_computer_pos, actual_computer_pos)
     validate_counts(t, "computer", expected_computer_files, actual_computer_files)
@@ -83,8 +83,8 @@ func TestLoadSenseIndex(t *testing.T) {
     actual_live_files := map[string]int {}
     for _, lemma_index := range liveLemmas {
         //fmt.Printf("%s: %v %s\n", "live", lemma_index, lemma_index.ToString())
-        actual_live_pos[lemma_index.ss_type]++
-        actual_live_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.lex_filenum]]++
+        actual_live_pos[lemma_index.PartOfSpeech]++
+        actual_live_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.LexographerFilenum]]++
     }
     validate_pos(t, "live", expected_live_pos, actual_live_pos)
     validate_counts(t, "live", expected_live_files, actual_live_files)

@@ -32,29 +32,29 @@ Pointers are followed and hierarchies traversed by moving from one synset to
 another via the synset_offset s.
 */
 
-type dataIndex map[string]dataIndexEntry
-type dataIndexEntry struct {
-    partOfSpeech int
-    synsetCount int
-    relationships []int
-    tagsenseCount int
-    synsetOffsets []int
+type dataIndex map[string]DataIndexEntry
+type DataIndexEntry struct {
+    PartOfSpeech int
+    SynsetCount int
+    Relationships []int
+    TagSenseCount int
+    SynsetOffsets []int
 }
 
-type dataFile map[int]dataEntry
-type dataEntry struct {
-    lex_filenum int
-    partOfSpeech int
-    words []string
-    lex_ids []int
-    relationships []relationshipEdge
+type dataFile map[int]Synset
+type Synset struct {
+    LexographerFilenum int
+    PartOfSpeech int
+    Words []string
+    LexIds []int
+    Relationships []RelationshipEdge
 }
-type relationshipEdge struct {
-    relationshipType int        // ANTONYM_RELATIONSHIP, etc.
-    synset_offset int           // synset offset of the target
-    pos int                     // part-of-speech of target
-    source_word_number int      // word number of the source
-    target_word_number int      // word number of the target
+type RelationshipEdge struct {
+    RelationshipType int      // ANTONYM_RELATIONSHIP, etc.
+    SynsetOffset int          // synset offset of the target
+    PartOfSpeech int          // part-of-speech of target
+    SourceWordNumber int      // word number of the source
+    TargetWordNumber int      // word number of the target
 }
 
 // Reads a index.POS (e.g. index.noun, index.verb, etc.) file and populates
@@ -112,12 +112,12 @@ func readPosIndex(posIndexFilename string) (*dataIndex, error) {
         if exists {
             fmt.Printf("WARNING: %s already exists. Overwriting.\n", lemma)
         }
-        index[lemma] = dataIndexEntry {
-            partOfSpeech: pos_tag,
-            synsetCount: synset_cnt,
-            relationships: relationships,
-            tagsenseCount: tagsense_cnt,
-            synsetOffsets: synsetOffsets,
+        index[lemma] = DataIndexEntry {
+            PartOfSpeech: pos_tag,
+            SynsetCount: synset_cnt,
+            Relationships: relationships,
+            TagSenseCount: tagsense_cnt,
+            SynsetOffsets: synsetOffsets,
         }
     }
 
@@ -172,7 +172,7 @@ func readPosData(posDataFilename string) (*dataFile, error) {
         }
         p_cnt, _ := strconv.Atoi(fields[fieldIndex])
         fieldIndex++
-        pointers := make([]relationshipEdge, p_cnt)
+        pointers := make([]RelationshipEdge, p_cnt)
         for i := 0; i < p_cnt; i++ {
             pointer_type, symbolFound := RELATIONSHIP_POINTER_SYMBOLS[fields[fieldIndex]]
             if !symbolFound {
@@ -189,23 +189,23 @@ func readPosData(posDataFilename string) (*dataFile, error) {
             fieldIndex++
             src_word_num := int(src_wordnum64)
             dest_word_num := int(dest_wordnum64)
-            pointers = append(pointers, relationshipEdge {
-                relationshipType: pointer_type,
-                synset_offset: synset_offset,
-                pos: pos,
-                source_word_number: src_word_num,
-                target_word_number: dest_word_num,
+            pointers = append(pointers, RelationshipEdge {
+                RelationshipType: pointer_type,
+                SynsetOffset: synset_offset,
+                PartOfSpeech: pos,
+                SourceWordNumber: src_word_num,
+                TargetWordNumber: dest_word_num,
             })
         }
         // skip data.verb frames
         // skip gloss
 
-        data[synset_offset] = dataEntry {
-                lex_filenum: lex_filenum,
-                partOfSpeech: ss_type,
-                words: words,
-                lex_ids: lex_ids,
-                relationships: pointers,
+        data[synset_offset] = Synset {
+                LexographerFilenum: lex_filenum,
+                PartOfSpeech: ss_type,
+                Words: words,
+                LexIds: lex_ids,
+                Relationships: pointers,
         }
     }
 
