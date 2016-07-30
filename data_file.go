@@ -48,6 +48,7 @@ type Synset struct {
     Words []string
     LexIds []int
     Relationships []RelationshipEdge
+    Gloss string
 }
 type RelationshipEdge struct {
     RelationshipType int      // ANTONYM_RELATIONSHIP, etc.
@@ -189,23 +190,30 @@ func readPosData(posDataFilename string) (*dataFile, error) {
             fieldIndex++
             src_word_num := int(src_wordnum64)
             dest_word_num := int(dest_wordnum64)
-            pointers = append(pointers, RelationshipEdge {
+            pointers[i] = RelationshipEdge {
                 RelationshipType: pointer_type,
                 SynsetOffset: synset_offset,
                 PartOfSpeech: pos,
                 SourceWordNumber: src_word_num,
                 TargetWordNumber: dest_word_num,
-            })
+            }
         }
         // skip data.verb frames
-        // skip gloss
 
+        pipeIndex := strings.LastIndex(line, "|")
+        var gloss string
+        if pipeIndex >= 0 {
+            gloss = strings.TrimSpace(line[pipeIndex + 2:])
+        } else {
+            gloss = ""
+        }
         data[synset_offset] = Synset {
                 LexographerFilenum: lex_filenum,
                 PartOfSpeech: ss_type,
                 Words: words,
                 LexIds: lex_ids,
                 Relationships: pointers,
+                Gloss: gloss,
         }
     }
 

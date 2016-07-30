@@ -53,8 +53,23 @@ func (wn *WN) Lookup(lemma string) []*SenseIndexEntry {
         return []*SenseIndexEntry{}
     }
     ret := make([]*SenseIndexEntry, len(senseEntries))
-    for i, e := range senseEntries {
-        ret[i] = &e
+    for i, _ := range senseEntries {
+        ret[i] = &senseEntries[i]
     }
     return ret
+}
+
+func (wn *WN) GetSynset(pos int, synsetOffset int) *Synset {
+  if pos == POS_ADJECTIVE_SATELLITE {
+    pos = POS_ADJECTIVE
+  }
+  idxPtr, exists := wn.posData[pos]
+  if !exists || idxPtr == nil {
+    return nil
+  }
+  s, exists := (*idxPtr)[synsetOffset]
+  if !exists {
+    return nil
+  }
+  return &s
 }
