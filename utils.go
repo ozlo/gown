@@ -198,7 +198,12 @@ const SYNTACTIC_MARKER_IMMEDIATELY_POSTNOMIAL_POSITION int = 3
  }
 
 func readStoredLemma(s string) string {
-    return strings.Replace(s, "_", " ", -1)
+    spaced := strings.Replace(s, "_", " ", -1)
+    if spaced[len(spaced) - 1] == ')' {
+        return spaced[0:len(spaced)-3]
+    } else {
+        return spaced
+    }
 }
 
 func writeStoredLemma(s string) string {

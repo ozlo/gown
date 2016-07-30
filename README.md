@@ -23,3 +23,8 @@ An index for looking up synsets related to a specific synset.
 * `verb.exc`
 * `adj.exc`
 * `adv.exc`
+
+# TODO
+* *Support inverse relationships*
+** *Support troponyms for verbs.* This requires adding a inverse relation for all verb hypernyms.
+** *Better support for verb groups.* Add fully connect words in a verb groups
