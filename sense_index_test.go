@@ -7,9 +7,9 @@ import (
 
 func TestLoadSenseIndex(t *testing.T) {
     senseIndexFile := "./wn-dict/index.sense"
-    senseIndex, _ := loadSenseIndex(senseIndexFile)
+    senseIndex, err := loadSenseIndex(senseIndexFile)
     if senseIndex == nil {
-        t.Errorf("Failed to load sense index: %v")
+        t.Fatalf("Failed to load sense index: %v", err)
     }
 
     /*
@@ -18,10 +18,10 @@ func TestLoadSenseIndex(t *testing.T) {
     */
     computerLemmas, _ := (*senseIndex)["computer"]
     if computerLemmas == nil || len(computerLemmas) == 0 {
-        t.Errorf("\"computer\" not found in sense index. Not loaded correctly?")
+        t.Fatalf("\"computer\" not found in sense index. Not loaded correctly?")
     }
     if len(computerLemmas) != 2 {
-        t.Errorf("expected 2 lemmas for \"computer\", but got %d\n", len(computerLemmas))
+        t.Fatalf("expected 2 lemmas for \"computer\", but got %d\n", len(computerLemmas))
     }
     expected_computer_pos := map[int]int { POS_NOUN: 2 }
     actual_computer_pos := map[int]int {}
@@ -62,10 +62,10 @@ func TestLoadSenseIndex(t *testing.T) {
     */
     liveLemmas, _ := (*senseIndex)["live"]
     if liveLemmas == nil || len(liveLemmas) == 0 {
-        t.Errorf("\"live\" not found in sense index. Not loaded correctly?")
+        t.Fatalf("\"live\" not found in sense index. Not loaded correctly?")
     }
     if len(liveLemmas) != 19 {
-        t.Errorf("expected 19 lemmas for \"live\", but got %d\n", len(liveLemmas))
+        t.Fatalf("expected 19 lemmas for \"live\", but got %d\n", len(liveLemmas))
     }
     expected_live_pos := map[int]int {
         POS_VERB: 7,
