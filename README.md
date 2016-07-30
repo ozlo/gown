@@ -26,4 +26,4 @@ An index for looking up synsets related to a specific synset.
 
 # TODO
 * *Support troponyms for verbs.* This requires adding a inverse relation for all verb hypernyms.
-* *Better support for verb groups.* Add fully connect words in a verb groups
+* *Better support for verb groups.* Fully connect words in a verb groups
