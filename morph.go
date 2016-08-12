@@ -76,7 +76,7 @@ var (
 func InitiMorphData(dictDirname string) {
     posNames := []string { "noun", "verb", "adj", "adv" }
     for posIndex, posName := range posNames {
-        exceptionFilename := string(filepath.Separator) + posName + ".exc"
+        exceptionFilename := dictDirname + string(filepath.Separator) + posName + ".exc"
         infile, err := os.Open(exceptionFilename)
         if err != nil {
             panic(fmt.Sprintf("Can't open morph exception file %s: %v", exceptionFilename, err))
@@ -139,9 +139,9 @@ func Morph(origword string, partOfSpeech int) []string {
 func morphword(origword string, partOfSpeech int) []string {
     lemmas := []string{}
     partOfSpeechIndex := getPosIndex(partOfSpeech)
-    excepts, exists := exceptions[partOfSpeechIndex][origword]
+    exception, exists := exceptions[partOfSpeechIndex][origword]
     if exists {
-        lemmas = append(lemmas, excepts)
+        lemmas = append(lemmas, exception)
     }
 
     if partOfSpeech == POS_ADVERB {
@@ -155,7 +155,7 @@ func morphword(origword string, partOfSpeech int) []string {
         if strings.HasSuffix(origword, "ful") {
             origword = origword[:len(origword) - 3]
         } else {
-            if strings.HasSuffix(origword, "ss") || len(origword) <= 2{
+            if strings.HasSuffix(origword, "ss") || len(origword) <= 2 {
                 return []string { origword }
             }
         }
@@ -173,9 +173,9 @@ func getPosIndex(partOfSpeech int) int {
 
 func findLemmas(origword string, partOfSpeech int) []string {
     partOfSpeechIndex := getPosIndex(partOfSpeech)
-    excepts, exists := exceptions[partOfSpeechIndex][origword]
+    exception, exists := exceptions[partOfSpeechIndex][origword]
     if exists {
-        return []string { excepts }
+        return []string { exception }
     } else {
         lemmas := []string{}
         wordlen := len(origword)
@@ -194,6 +194,11 @@ func findLemmas(origword string, partOfSpeech int) []string {
                 break
             }
         }
-        return lemmas
+
+        if len(lemmas) == 0 {
+            return []string { origword }
+        } else {
+            return lemmas
+        }
     }
 }
