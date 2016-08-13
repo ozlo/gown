@@ -38,33 +38,6 @@ var (
         },
     }
 
-    addr = [][]string {
-        // noun
-        []string { "", "s", "x", "z", "ch", "sh", "man", "y" },
-        // verb
-        []string { "", "y", "e", "", "e", "", "e", "" },
-        // adjective
-        []string { "", "", "e", "e" },
-    }
-
-    prepositions = map[string]struct{} {
-        "to": struct{}{},
-        "at": struct{}{},
-        "of": struct{}{},
-        "on": struct{}{},
-        "off": struct{}{},
-        "in": struct{}{},
-        "out": struct{}{},
-        "up": struct{}{},
-        "down": struct{}{},
-        "from": struct{}{},
-        "with": struct{}{},
-        "into": struct{}{},
-        "for": struct{}{},
-        "about": struct{}{},
-        "between": struct{}{},
-    }
-
     exceptions []map[string]string = []map[string]string {
         map[string]string{},    // noun
         map[string]string{},    // verb
@@ -105,100 +78,69 @@ func InitiMorphData(dictDirname string) {
 }
 
 
-// Returns a set of lemmatizations for the word. We assume the word is in the
-// raw form. (i.e. spaces are spaces, not '_')
-func Morph(origword string, partOfSpeech int) []string {
+// Returns a lemmatizations for the word. We assume the word is in the
+// raw form. (i.e. spaces are spaces, not '_') This algorithim is similar to,
+// but not exactly the same as the Wordnet Morphy algorithm.
+func (wn *WN) Morph(origword string, partOfSpeech int) string {
     partOfSpeechIndex := getPosIndex(partOfSpeech)
     if partOfSpeechIndex < 0  {
         // no idea, it's not a supported part of speech
-        return []string { origword }
+        return origword
     }
 
     // check the exception lists
     lemma, exists := exceptions[partOfSpeechIndex][origword]
     if exists {
-        return []string{ lemma }
-    }
-
-    if partOfSpeech == POS_VERB {
-        toks := strings.Split(" ", origword)
-        ending := ""
-        if len(toks) > 1 {
-            ending = " " + strings.Join(toks[1:], " ")
-        }
-        results := []string{}
-        for _, lemma := range findLemmas(toks[0], partOfSpeech) {
-            results = append(results, lemma + ending)
-        }
-        return results
+        return lemma
     } else {
-        return morphword(origword, partOfSpeech)
-    }
-}
-
-func morphword(origword string, partOfSpeech int) []string {
-    lemmas := []string{}
-    partOfSpeechIndex := getPosIndex(partOfSpeech)
-    exception, exists := exceptions[partOfSpeechIndex][origword]
-    if exists {
-        lemmas = append(lemmas, exception)
+        lemma = origword
     }
 
     if partOfSpeech == POS_ADVERB {
-         // skip it
-        if len(lemmas) == 0 {
-            return []string { origword }
-        } else {
-            return lemmas
-        }
-    } else if partOfSpeech == POS_NOUN {
-        if strings.HasSuffix(origword, "ful") {
-            origword = origword[:len(origword) - 3]
-        } else {
-            if strings.HasSuffix(origword, "ss") || len(origword) <= 2 {
-                return []string { origword }
+        // only use the exception lists for adverbs
+        return origword
+    } else {
+        // replace the suffxes
+        if partOfSpeech == POS_NOUN {
+            if strings.HasSuffix(origword, "ful") {
+                origword = origword[:len(origword) - 3]
+            } else {
+                if strings.HasSuffix(origword, "ss") || len(origword) <= 2 {
+                    // too small
+                    return origword
+                }
             }
         }
-    }
 
-    return append(lemmas, findLemmas(origword, partOfSpeech)...)
-}
+        for i := 1; i <= 4; i++ {
+            suffixIndex := len(origword) - i
 
-func getPosIndex(partOfSpeech int) int {
-    if partOfSpeech == POS_ADJECTIVE_SATELLITE {
-        partOfSpeech = POS_ADJECTIVE
-    }
-    return partOfSpeech - 1
-}
+            if suffixIndex <= 0 {
+                break;
+            }
 
-func findLemmas(origword string, partOfSpeech int) []string {
-    partOfSpeechIndex := getPosIndex(partOfSpeech)
-    exception, exists := exceptions[partOfSpeechIndex][origword]
-    if exists {
-        return []string { exception }
-    } else {
-        lemmas := []string{}
-        wordlen := len(origword)
-        for lastIndex := 1; lastIndex <= 4; lastIndex++ {
-            if (wordlen - lastIndex) > 0 {
-                suffix := origword[lastIndex:]
-                replacements, suffixFound := suffixReplacements[partOfSpeechIndex][suffix]
-                if suffixFound {
-                    prefix := origword[:lastIndex]
-                    for _, replace := range replacements {
-                        lemmas = append(lemmas, prefix + replace)
+            baseword := origword[:suffixIndex]
+            suffix := origword[suffixIndex:]
+            replacements, found := suffixReplacements[partOfSpeechIndex][suffix]
+            if found {
+                for _, replacement := range replacements {
+                    possibleLemma := baseword + replacement
+                    resp := wn.Lookup(possibleLemma)
+                    if len(resp) > 0 {
+                        // found it!
+                        return possibleLemma
                     }
                 }
-            } else {
-                // not enough letters
-                break
             }
         }
 
-        if len(lemmas) == 0 {
-            return []string { origword }
-        } else {
-            return lemmas
-        }
+        return origword
     }
+}
+
+func getPosIndex(pos int) int {
+    if pos == POS_ADJECTIVE_SATELLITE {
+        pos = POS_ADJECTIVE
+    }
+    return pos - 1
 }
