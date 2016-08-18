@@ -52,7 +52,6 @@ func printSynsetPtr(wn *gown.WN, synsetPtr *gown.Synset) {
     if synsetPtr == nil {
       fmt.Printf("\tNO SYNSET!\n")
     } else {
-      //fmt.Printf("\t%v\n", *synsetPtr)
       fmt.Printf("\tGloss: %s\n", synsetPtr.Gloss)
       fmt.Printf("\tLexFile: %s POS: %s\n",
         gown.LEXOGRAPHER_FILE_NUM_TO_NAME[synsetPtr.LexographerFilenum],
@@ -72,7 +71,6 @@ func printSynsetPtr(wn *gown.WN, synsetPtr *gown.Synset) {
 }
 
 func printRelationship(wn *gown.WN, i int, relation gown.RelationshipEdge, srcWords []string) {
-    //fmt.Printf("\t\t%v\n", relation)
     fmt.Printf("\t\t%d: %s (%d) >> ", i, gown.RELATIONSHIP_ID_TO_STRING[relation.RelationshipType], relation.RelationshipType)
     targetPtr := wn.GetSynset(relation.PartOfSpeech, relation.SynsetOffset)
     if targetPtr != nil {
