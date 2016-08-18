@@ -6,9 +6,10 @@ import (
 )
 
 func main() {
-  wn, err := gown.LoadWordNet("./wn-dict")
+  dictDir, _ := gown.GetWordNetDictDir()
+  wn, err := gown.LoadWordNet(dictDir)
   if err != nil {
-    fmt.Printf("can't load WordNet: %v\n", err)
+    fmt.Printf("can't load WordNet from %v: %v\n", dictDir, err)
     return
   }
 

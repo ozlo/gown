@@ -6,7 +6,8 @@ import (
 )
 
 func TestLoadSenseIndex(t *testing.T) {
-    senseIndexFile := "./wn-dict/index.sense"
+    dictDir, _ := GetWordNetDictDir()
+    senseIndexFile := dictDir + "/index.sense"
     senseIndex, err := loadSenseIndex(senseIndexFile)
     if senseIndex == nil {
         t.Fatalf("Failed to load sense index: %v", err)

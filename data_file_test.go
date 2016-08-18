@@ -9,8 +9,9 @@ var (
 )
 
 func TestLoadPosIndex(t *testing.T) {
+    dictDir, _ := GetWordNetDictDir()
     for _, posName := range POS_FILE_NAMES {
-        posIndexFilename := "./wn-dict/index."  + posName
+        posIndexFilename := dictDir + "/index."  + posName
         _, err := readPosIndex(posIndexFilename)
         if err != nil {
             t.Fatalf("failed to read %s: %v", posIndexFilename, err)
@@ -19,8 +20,9 @@ func TestLoadPosIndex(t *testing.T) {
 }
 
 func TestLoadPosData(t *testing.T) {
+    dictDir, _ := GetWordNetDictDir()
     for _, posName := range POS_FILE_NAMES {
-        posDataFilename := "./wn-dict/data."  + posName
+        posDataFilename := dictDir + "/data."  + posName
         _, err := readPosData(posDataFilename)
         if err != nil {
             t.Fatalf("failed to read %s: %v", posDataFilename, err)

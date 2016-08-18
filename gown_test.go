@@ -5,13 +5,16 @@ import (
 )
 
 func BenchmarkLoadWordNet(b *testing.B) {
+    dictDir, _ := GetWordNetDictDir()
+    b.ResetTimer()
     for i := 0; i < b.N; i++ {
-        LoadWordNet("./wn-dict")
+        LoadWordNet(dictDir)
     }
 }
 
 func BenchmarkLookupWithPartOfSpeech(b *testing.B) {
-    wn, _ := LoadWordNet("./wn-dict")
+    dictDir, _ := GetWordNetDictDir()
+    wn, _ := LoadWordNet(dictDir)
     b.ResetTimer()
     for i := 0; i < b.N; i++ {
         wn.LookupWithPartOfSpeech("computer", POS_NOUN)
@@ -19,7 +22,8 @@ func BenchmarkLookupWithPartOfSpeech(b *testing.B) {
 }
 
 func BenchmarkLookup(b *testing.B) {
-    wn, _ := LoadWordNet("./wn-dict")
+    dictDir, _ := GetWordNetDictDir()
+    wn, _ := LoadWordNet(dictDir)
     b.ResetTimer()
     for i := 0; i < b.N; i++ {
         wn.Lookup("live")

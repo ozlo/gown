@@ -1,10 +1,55 @@
 package gown
 
+import (
+    "fmt"
+    "os"
+)
+
 type WN struct {
     senseIndex *senseIndex
     posIndicies map[int]*dataIndex
     posData map[int]*dataFile
 }
+
+func GetWordNetDictDir() (string, error) {
+    systemDefaults := []string {
+        "/usr/WordNet-3.%d/dict",
+        "/usr/share/WordNet-3.%d/dict",
+        "/usr/local/WordNet-3.%d/dict",
+        "/usr/local/share/WordNet-3.%d/dict",
+        "/opt/WordNet-3.%d/dict",
+        "/opt/share/WordNet-3.%d/dict",
+        "/opt/local/WordNet-3.%d/dict",
+        "/opt/local/share/WordNet-3.%d/dict",
+    }
+    // check environment variables
+    dictname := os.Getenv("WNHOME") + "/dict"
+    _, err := os.Stat(dictname)
+    if err == nil {
+        return dictname, nil
+    }
+
+    dictname = os.Getenv("WNSEARCHDIR")
+    _, err = os.Stat(dictname)
+    if err == nil {
+        return dictname, nil
+    }
+
+    // check possible installation dirs
+    for v := 0; v <= 1; v++ {   // checks for WordNet 3.0 and 3.1
+        for _, systemDefault := range systemDefaults {
+            dictname = fmt.Sprintf(systemDefault, v)
+            _, err = os.Stat(dictname)
+            if err == nil {
+                return dictname, nil
+            }
+        }
+    }
+
+    // tried everything
+    return "", fmt.Errorf("Can't find WordNet dictionary")
+}
+
 
 func LoadWordNet(dictDirname string) (*WN, error) {
     wn := WN {
