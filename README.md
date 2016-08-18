@@ -25,6 +25,5 @@ An index for looking up synsets related to a specific synset.
 * `adv.exc`
 
 # TODO
-* morph() support
 * *Support troponyms for verbs.* This requires adding a inverse relation for all verb hypernyms.
 * *Better support for verb groups.* Fully connect words in a verb groups
