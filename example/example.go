@@ -13,29 +13,35 @@ func main() {
     return
   }
 
-  // We'll load the word "live" which can be used as verb, adjective, or adverb
-  fmt.Printf("live\n")
-  for resultId, senseIndexEntry := range wn.Lookup("live") {
-    printSenseIndexEntry(wn, resultId, senseIndexEntry)
-    fmt.Printf("\n")
-  }
-
-  fmt.Printf("\n===================\n\n")
-
-  // now let's lookup a word with a known part of speech
-  dataIndexEntry := wn.LookupWithPartOfSpeech("computer", gown.POS_NOUN)
-  if dataIndexEntry == nil {
-      fmt.Printf("Can't found a computer as a noun!\n")
-  } else {
-      fmt.Printf("computer (noun)\n")
-      fmt.Printf("%v\n", *dataIndexEntry)
-      for _, synsetOffset := range dataIndexEntry.SynsetOffsets {
-          printSynsetPtr(wn, wn.GetSynset(gown.POS_NOUN, synsetOffset))
-          fmt.Printf("\n")
-      }
-  }
-
+  printLookup(wn, "live")
+  printLookupWithPartOfSpeech(wn, "computer", gown.POS_NOUN)
 }
+
+func printLookup(wn *gown.WN, word string) {
+    fmt.Printf("\n===================\n\n")
+    fmt.Printf("live on\n")
+    for resultId, senseIndexEntry := range wn.Lookup(word) {
+        printSenseIndexEntry(wn, resultId, senseIndexEntry)
+        fmt.Printf("\n")
+    }
+}
+
+func printLookupWithPartOfSpeech(wn *gown.WN, word string, pos int) {
+    fmt.Printf("\n===================\n\n")
+    fmt.Printf("live on\n")
+    dataIndexEntry := wn.LookupWithPartOfSpeech(word, pos)
+    if dataIndexEntry == nil {
+        fmt.Printf("Can't found a \"%s\" as a %s!\n", word, gown.PART_OF_SPEECH_ID_TO_STRING[pos])
+    } else {
+        fmt.Printf("%s (%s)\n", word, gown.PART_OF_SPEECH_ID_TO_STRING[pos])
+        fmt.Printf("%v\n", *dataIndexEntry)
+        for _, synsetOffset := range dataIndexEntry.SynsetOffsets {
+            printSynsetPtr(wn, wn.GetSynset(pos, synsetOffset))
+            fmt.Printf("\n")
+        }
+    }
+}
+
 
 func printSenseIndexEntry(wn *gown.WN, resultId int, senseIndexEntry *gown.SenseIndexEntry) {
   fmt.Printf("\tresultId: %2d POS: (%d) %s TagCount: %d synsetOffset: %d\n",

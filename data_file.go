@@ -58,6 +58,24 @@ type RelationshipEdge struct {
     TargetWordNumber int      // word number of the target
 }
 
+type DataIndexPair struct {
+    Lexeme string
+    IndexEntry DataIndexEntry
+}
+func DataIndexIterator(di *dataIndex) <-chan DataIndexPair {
+    ch := make(chan DataIndexPair)
+    go func() {
+        for k, v := range *di {
+            ch <- DataIndexPair {
+                Lexeme: k,
+                IndexEntry: v,
+            }
+        }
+        close(ch) // Remember to close or the loop never ends!
+    }()
+    return ch
+}
+
 // Reads a index.POS (e.g. index.noun, index.verb, etc.) file and populates
 // a dataIndex . The index format is:
 // lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]

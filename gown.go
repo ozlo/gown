@@ -7,7 +7,7 @@ import (
 
 type WN struct {
     senseIndex *senseIndex
-    posIndicies map[int]*dataIndex
+    PosIndicies map[int]*dataIndex
     posData map[int]*dataFile
 }
 
@@ -54,7 +54,7 @@ func GetWordNetDictDir() (string, error) {
 func LoadWordNet(dictDirname string) (*WN, error) {
     wn := WN {
         senseIndex: nil,
-        posIndicies: map[int]*dataIndex{},
+        PosIndicies: map[int]*dataIndex{},
         posData: map[int]*dataFile{},
     }
 
@@ -66,7 +66,7 @@ func LoadWordNet(dictDirname string) (*WN, error) {
 
     pos_file_names := []string { "", "noun", "verb", "adj", "adv" }
     for i := 1; i < len(pos_file_names); i++ {
-        wn.posIndicies[i], err = readPosIndex(dictDirname + "/index." + pos_file_names[i])
+        wn.PosIndicies[i], err = readPosIndex(dictDirname + "/index." + pos_file_names[i])
         if err != nil {
             return nil, err
         }
@@ -80,7 +80,7 @@ func LoadWordNet(dictDirname string) (*WN, error) {
 }
 
 func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
-    posIndexPtr, exists := wn.posIndicies[pos]
+    posIndexPtr, exists := wn.PosIndicies[pos]
     if !exists {
         return nil
     }
