@@ -46,7 +46,7 @@ var (
     }
 )
 
-func InitiMorphData(dictDirname string) {
+func (wn *WN) InitMorphData(dictDirname string) {
     posNames := []string { "noun", "verb", "adj", "adv" }
     for posIndex, posName := range posNames {
         exceptionFilename := dictDirname + string(filepath.Separator) + posName + ".exc"
@@ -81,6 +81,9 @@ func InitiMorphData(dictDirname string) {
 // Returns a lemmatizations for the word. We assume the word is in the
 // raw form. (i.e. spaces are spaces, not '_') This algorithim is similar to,
 // but not exactly the same as the Wordnet Morphy algorithm.
+//
+// This function does not handle prepositional verb phrases,
+// If no base morph is found, assumes the original word is the base.
 func (wn *WN) Morph(origword string, partOfSpeech int) string {
     partOfSpeechIndex := getPosIndex(partOfSpeech)
     if partOfSpeechIndex < 0  {
@@ -99,43 +102,51 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
     if partOfSpeech == POS_ADVERB {
         // only use the exception lists for adverbs
         return origword
-    } else {
-        // replace the suffxes
-        if partOfSpeech == POS_NOUN {
-            if strings.HasSuffix(origword, "ful") {
-                origword = origword[:len(origword) - 3]
-            } else {
-                if strings.HasSuffix(origword, "ss") || len(origword) <= 2 {
-                    // too small
-                    return origword
-                }
-            }
-        }
-
-        for i := 1; i <= 4; i++ {
-            suffixIndex := len(origword) - i
-
-            if suffixIndex <= 0 {
-                break;
-            }
-
-            baseword := origword[:suffixIndex]
-            suffix := origword[suffixIndex:]
-            replacements, found := suffixReplacements[partOfSpeechIndex][suffix]
-            if found {
-                for _, replacement := range replacements {
-                    possibleLemma := baseword + replacement
-                    resp := wn.Lookup(possibleLemma)
-                    if len(resp) > 0 {
-                        // found it!
-                        return possibleLemma
-                    }
-                }
-            }
-        }
-
-        return origword
     }
+
+    if partOfSpeech != POS_VERB {
+        // check the original
+        resp := wn.Lookup(origword)
+        if len(resp) > 0 {
+            return origword
+        }
+    }
+
+    if partOfSpeech == POS_NOUN {
+        // if it's a noun, drop the -full or -ss suffixes
+        if strings.HasSuffix(origword, "ful") {
+            origword = origword[:len(origword) - 3]
+        } else {
+            if strings.HasSuffix(origword, "ss") || len(origword) <= 2 {
+                // too small
+                return origword
+            }
+        }
+    }
+
+    for i := 1; i <= 4; i++ {
+        suffixIndex := len(origword) - i
+        if suffixIndex <= 0 {
+            break;
+        }
+
+        baseword := origword[:suffixIndex]
+        suffix := origword[suffixIndex:]
+        replacements, found := suffixReplacements[partOfSpeechIndex][suffix]
+        if found {
+            for _, replacement := range replacements {
+                possibleLemma := baseword + replacement
+                resp := wn.Lookup(possibleLemma)
+                if len(resp) > 0 {
+                    // found it!
+                    return possibleLemma
+                }
+            }
+        }
+    }
+
+    // failed
+    return origword
 }
 
 func getPosIndex(pos int) int {
