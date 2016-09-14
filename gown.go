@@ -9,6 +9,7 @@ type WN struct {
     senseIndex *senseIndex
     PosIndicies map[int]*dataIndex
     posData map[int]*dataFile
+    exceptions []map[string]string
 }
 
 func GetWordNetDictDir() (string, error) {

@@ -37,16 +37,16 @@ var (
             "est": []string { "", "e"},
         },
     }
+)
 
-    exceptions []map[string]string = []map[string]string {
+func (wn *WN) InitMorphData(dictDirname string) {
+    wn.exceptions = []map[string]string {
         map[string]string{},    // noun
         map[string]string{},    // verb
         map[string]string{},    // adjective
         map[string]string{},    // adverb
     }
-)
 
-func (wn *WN) InitMorphData(dictDirname string) {
     posNames := []string { "noun", "verb", "adj", "adv" }
     for posIndex, posName := range posNames {
         exceptionFilename := dictDirname + string(filepath.Separator) + posName + ".exc"
@@ -71,7 +71,7 @@ func (wn *WN) InitMorphData(dictDirname string) {
             fields := strings.SplitN(strings.TrimSpace(string(bytebuf)), " ", -1)
             derivedForm := strings.Replace(fields[0], "_", " ", -1)
             baseForm := strings.Replace(fields[1], "_", " ", -1)
-            exceptions[posIndex][derivedForm] = baseForm
+            wn.exceptions[posIndex][derivedForm] = baseForm
         }
         infile.Close()
     }
@@ -92,7 +92,7 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
     }
 
     // check the exception lists
-    lemma, exists := exceptions[partOfSpeechIndex][origword]
+    lemma, exists := wn.exceptions[partOfSpeechIndex][origword]
     if exists {
         return lemma
     } else {
