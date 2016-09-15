@@ -88,20 +88,18 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
     partOfSpeechIndex := getPosIndex(partOfSpeech)
     if partOfSpeechIndex < 0  {
         // no idea, it's not a supported part of speech
-        return origword
+        return ""
     }
 
     // check the exception lists
     lemma, exists := wn.exceptions[partOfSpeechIndex][origword]
     if exists {
         return lemma
-    } else {
-        lemma = origword
     }
 
     if partOfSpeech == POS_ADVERB {
         // only use the exception lists for adverbs
-        return origword
+        return ""
     }
 
     if partOfSpeech != POS_VERB {
@@ -146,7 +144,7 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
     }
 
     // failed
-    return origword
+    return ""
 }
 
 func getPosIndex(pos int) int {

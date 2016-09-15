@@ -3,6 +3,7 @@ package gown
 import (
     "fmt"
     "os"
+    "strings"
 )
 
 type WN struct {
@@ -85,7 +86,7 @@ func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
     if !exists {
         return nil
     }
-    sn, exists := (*posIndexPtr)[lemma]
+    sn, exists := (*posIndexPtr)[strings.ToLower(lemma)]
     if exists {
         return &sn
     } else {
@@ -94,7 +95,7 @@ func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
 }
 
 func (wn *WN) Lookup(lemma string) []*SenseIndexEntry {
-    senseEntries, exists := (*wn.senseIndex)[lemma]
+    senseEntries, exists := (*wn.senseIndex)[strings.ToLower(lemma)]
     if !exists {
         return []*SenseIndexEntry{}
     }

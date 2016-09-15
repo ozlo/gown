@@ -47,6 +47,7 @@ func TestMorph(t *testing.T) {
         POS_VERB, // remains
         POS_NOUN, // plant
         POS_NOUN, // Angus
+        POS_NOUN, // Angus
         POS_VERB, // walked
         POS_NOUN, // park
         POS_VERB, // jumping
@@ -67,6 +68,7 @@ func TestMorph(t *testing.T) {
         "remains",
         "plant",
         "Angus",
+        "angus",
         "walked",
         "park",
         "jumping",
@@ -87,6 +89,7 @@ func TestMorph(t *testing.T) {
         "remain",
         "plant",
         "Angus",
+        "angus",
         "walk",
         "park",
         "jump",
