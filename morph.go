@@ -104,8 +104,8 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
 
     if partOfSpeech != POS_VERB {
         // check the original
-        resp := wn.Lookup(origword)
-        if len(resp) > 0 {
+        dataIndexEntry := wn.LookupWithPartOfSpeech(origword, partOfSpeech)
+        if dataIndexEntry != nil {
             return origword
         }
     }
@@ -134,8 +134,8 @@ func (wn *WN) Morph(origword string, partOfSpeech int) string {
         if found {
             for _, replacement := range replacements {
                 possibleLemma := baseword + replacement
-                resp := wn.Lookup(possibleLemma)
-                if len(resp) > 0 {
+                dataIndexEntry := wn.LookupWithPartOfSpeech(possibleLemma, partOfSpeech)
+                if dataIndexEntry != nil {
                     // found it!
                     return possibleLemma
                 }

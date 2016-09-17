@@ -55,6 +55,8 @@ func TestMorph(t *testing.T) {
         POS_NOUN, // octopi
         POS_NOUN, // octopus
         POS_NOUN, // ewoks
+        POS_VERB, // wanted
+        POS_VERB, // grilled
     }
     inputs := []string {
         "are",
@@ -77,6 +79,8 @@ func TestMorph(t *testing.T) {
         "octopi",
         "octopus",
         "ewoks",
+        "wanted",
+        "grilled",
     }
     expecteds := []string {
         "be",
@@ -99,6 +103,8 @@ func TestMorph(t *testing.T) {
         "octopus",
         "octopus",
         "", // ewok
+        "want",
+        "grill",
     }
 
     for i, pos := range poses {
