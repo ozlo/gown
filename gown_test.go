@@ -47,12 +47,16 @@ func TestMorph(t *testing.T) {
         POS_VERB, // remains
         POS_NOUN, // plant
         POS_NOUN, // Angus
+        POS_NOUN, // Angus
         POS_VERB, // walked
         POS_NOUN, // park
         POS_VERB, // jumping
         POS_NOUN, // octopuses
         POS_NOUN, // octopi
         POS_NOUN, // octopus
+        POS_NOUN, // ewoks
+        POS_VERB, // wanted
+        POS_VERB, // grilled
     }
     inputs := []string {
         "are",
@@ -67,12 +71,16 @@ func TestMorph(t *testing.T) {
         "remains",
         "plant",
         "Angus",
+        "angus",
         "walked",
         "park",
         "jumping",
         "octopuses",
         "octopi",
         "octopus",
+        "ewoks",
+        "wanted",
+        "grilled",
     }
     expecteds := []string {
         "be",
@@ -87,12 +95,16 @@ func TestMorph(t *testing.T) {
         "remain",
         "plant",
         "Angus",
+        "angus",
         "walk",
         "park",
         "jump",
         "octopus",
         "octopus",
         "octopus",
+        "", // ewok
+        "want",
+        "grill",
     }
 
     for i, pos := range poses {

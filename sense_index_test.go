@@ -1,7 +1,6 @@
 package gown
 
 import (
-    //"fmt"
     "testing"
 )
 
@@ -13,6 +12,8 @@ func TestLoadSenseIndex(t *testing.T) {
         t.Fatalf("Failed to load sense index: %v", err)
     }
 
+    // ------------------------------------------------------------------------
+    // validate "computer"
     /*
     computer: {1  6 0 0 3086983 1 6} { NOUN, file: noun.artifact, lex_id: 0 head: , head_id: 0, synset_offset: 3086983, sense_number: 1, tag_cnt: 6 }
     computer: {1 18 0 0 9906486 2 0} { NOUN, file: noun.person,   lex_id: 0 head: , head_id: 0, synset_offset: 9906486, sense_number: 2, tag_cnt: 0 }
@@ -32,14 +33,17 @@ func TestLoadSenseIndex(t *testing.T) {
     }
     actual_computer_files := map[string]int {}
     for _, lemma_index := range computerLemmas {
-        //fmt.Printf("%s: %v %s\n", "computer", lemma_index, lemma_index.ToString())
+        t.Logf("%s: %v %s\n", "computer", lemma_index, lemma_index.ToString())
         actual_computer_pos[lemma_index.PartOfSpeech]++
         actual_computer_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.LexographerFilenum]]++
     }
     validate_pos(t, "computer", expected_computer_pos, actual_computer_pos)
     validate_counts(t, "computer", expected_computer_files, actual_computer_files)
-    //fmt.Printf("\n")
+    t.Logf("\n")
 
+
+    // ------------------------------------------------------------------------
+    // validate "live"
     /*
     live%2:31:00:: 00598039 6 1
     live%2:42:00:: 02620216 5 14
@@ -83,12 +87,42 @@ func TestLoadSenseIndex(t *testing.T) {
     }
     actual_live_files := map[string]int {}
     for _, lemma_index := range liveLemmas {
-        //fmt.Printf("%s: %v %s\n", "live", lemma_index, lemma_index.ToString())
+        t.Logf("%s: %v %s\n", "live", lemma_index, lemma_index.ToString())
         actual_live_pos[lemma_index.PartOfSpeech]++
         actual_live_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.LexographerFilenum]]++
     }
     validate_pos(t, "live", expected_live_pos, actual_live_pos)
     validate_counts(t, "live", expected_live_files, actual_live_files)
+    t.Logf("\n")
+
+    // ------------------------------------------------------------------------
+    // validate "Angus"
+    /*
+    02408581 05 n 03 Aberdeen_Angus 0 Angus 0 black_Angus 0 001 @ 02406838 n 0000 | black hornless breed from Scotland
+    */
+    angusLemmas, _ := (*senseIndex)["angus"]
+    t.Logf("angusLemmas = %v\n", angusLemmas)
+    if angusLemmas == nil || len(angusLemmas) == 0 {
+        t.Fatalf("\"angus\" not found in sense index. Not loaded correctly?")
+    }
+    if len(angusLemmas) != 2 {
+        t.Fatalf("expected 2 lemmas for \"angus\", but got %d\n", len(angusLemmas))
+    }
+    expected_angus_pos := map[int]int { POS_NOUN: 2 }
+    actual_angus_pos := map[int]int {}
+    expected_angus_files := map[string]int {
+        "noun.animal": 1,
+        "noun.person": 1,
+    }
+    actual_angus_files := map[string]int {}
+    for _, lemma_index := range angusLemmas {
+        t.Logf("%s: %v %s\n", "angus", lemma_index, lemma_index.ToString())
+        actual_angus_pos[lemma_index.PartOfSpeech]++
+        actual_angus_files[LEXOGRAPHER_FILE_NUM_TO_NAME[lemma_index.LexographerFilenum]]++
+    }
+    validate_pos(t, "angus", expected_angus_pos, actual_angus_pos)
+    validate_counts(t, "angus", expected_angus_files, actual_angus_files)
+    t.Logf("\n")
 }
 
 func validate_pos(t *testing.T, word string, expected map[int]int, actual map[int]int) {
