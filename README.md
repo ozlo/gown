@@ -1,6 +1,8 @@
 # GOWN
 A Go implementation of the WordNet API.
 
+This code is stable, and is currently in production at Ozlo.
+
 ## Requirements
 * WordNet database files https://wordnet.princeton.edu/wordnet/download/current-version/
 
