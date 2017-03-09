@@ -116,3 +116,25 @@ func TestMorph(t *testing.T) {
         }
     }
 }
+
+func TestIterate(t *testing.T) {
+    dictDir, _ := GetWordNetDictDir()
+    wn, _ := LoadWordNet(dictDir)
+
+    atLeast := 1000
+    i := 0
+    for synset := range wn.Iter() {
+        if i < atLeast {
+            for _, _ = range synset.Words {
+                i++
+                if i == atLeast {
+                    break
+                }
+            }
+        }
+    }
+
+    if i < atLeast {
+        t.Errorf("expected to read at least %v, but only got %v", atLeast, i)
+    }
+}

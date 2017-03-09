@@ -120,3 +120,36 @@ func (wn *WN) GetSynset(pos int, synsetOffset int) *Synset {
   }
   return &s
 }
+
+func (wn *WN) Iter() <-chan Synset {
+    outChan := make(chan Synset)
+    go func () {
+        for _, datFile := range wn.posData {
+            for _, synset := range *datFile {
+                words := make([]string, len(synset.Words))
+                for i, w := range synset.Words {
+                    words[i] = w
+                }
+                lexids := make([]int, len(synset.LexIds))
+                for i, w := range synset.LexIds {
+                    lexids[i] = w
+                }
+                edges := make([]RelationshipEdge, len(synset.Relationships))
+                for i, w := range synset.Relationships {
+                    edges[i] = w
+                }
+                outChan <- Synset {
+                    SynsetOffset: synset.SynsetOffset,
+                    LexographerFilenum: synset.LexographerFilenum,
+                    PartOfSpeech: synset.PartOfSpeech,
+                    Words: words,
+                    LexIds: lexids,
+                    Relationships: edges,
+                    Gloss: synset.Gloss,
+                }
+            }
+        }
+        close(outChan)
+    } ();
+    return outChan
+}

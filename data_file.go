@@ -43,6 +43,7 @@ type DataIndexEntry struct {
 
 type dataFile map[int]Synset
 type Synset struct {
+    SynsetOffset int
     LexographerFilenum int
     PartOfSpeech int
     Words []string
@@ -225,7 +226,9 @@ func readPosData(posDataFilename string) (*dataFile, error) {
         } else {
             gloss = ""
         }
+
         data[synset_offset] = Synset {
+                SynsetOffset: synset_offset,
                 LexographerFilenum: lex_filenum,
                 PartOfSpeech: ss_type,
                 Words: words,
