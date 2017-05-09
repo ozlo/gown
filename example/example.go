@@ -19,7 +19,7 @@ func main() {
 
 func printLookup(wn *gown.WN, word string) {
 	fmt.Printf("\n===================\n\n")
-	fmt.Printf("live on\n")
+	fmt.Printf("Lookup %q\n", word)
 	for resultId, senseIndexEntry := range wn.Lookup(word) {
 		printSenseIndexEntry(wn, resultId, senseIndexEntry)
 		fmt.Printf("\n")
@@ -28,7 +28,7 @@ func printLookup(wn *gown.WN, word string) {
 
 func printLookupWithPartOfSpeech(wn *gown.WN, word string, pos int) {
 	fmt.Printf("\n===================\n\n")
-	fmt.Printf("live on\n")
+	fmt.Printf("LookupWithPartOfSpeech %q %d\n", word, pos)
 	dataIndexEntry := wn.LookupWithPartOfSpeech(word, pos)
 	if dataIndexEntry == nil {
 		fmt.Printf("Can't found a \"%s\" as a %s!\n", word, gown.PART_OF_SPEECH_ID_TO_STRING[pos])
@@ -98,12 +98,15 @@ func printRelationship(wn *gown.WN, i int, relation gown.RelationshipEdge, srcWo
 			gown.PART_OF_SPEECH_ID_TO_STRING[relation.PartOfSpeech],
 			relation.SynsetOffset,
 			targetPtr.Words,
+
 			relation.SourceWordNumber,
 			srcWordNumber,
 			srcWords[srcWordNumber], star,
+
 			relation.TargetWordNumber,
 			targetWordNumber,
 			targetPtr.Words[targetWordNumber], star,
+			
 			relation)
 	} else {
 		fmt.Printf("NIL RELATION\n")

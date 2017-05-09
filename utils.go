@@ -77,7 +77,7 @@ var (
         ";u": DOMAIN_OF_SYNSET_USAGE_RELATIONSHIP,
         "-u": MEMBER_OF_THIS_DOMAIN_USAGE_RELATIONSHIP,
 
-        // verb relationships
+        // verb relationships (documented here, defined above)
         // ANTONYM_RELATIONSHIP
         // HYPERNYM_RELATIONSHIP
         // HYPONYM_RELATIONSHIP
@@ -90,7 +90,7 @@ var (
         // DOMAIN_OF_SYNSET_REGION_RELATIONSHIP,
         // DOMAIN_OF_SYNSET_USAGE_RELATIONSHIP,
 
-        // adjective relationships
+        // adjective relationships (documented here, defined above)
         // ANTONYM_RELATIONSHIP
         "&": SIMILAR_TO_RELATIONSHIP,
         "<": PARTICIPLE_OF_VERB_RELATIONSHIP,
@@ -101,7 +101,7 @@ var (
         // DOMAIN_OF_SYNSET_REGION_RELATIONSHIP
         // DOMAIN_OF_SYNSET_USAGE_RELATIONSHIP
 
-        // adverb relationships
+        // adverb relationships (documented here, defined above)
         // ANTONYM_RELATIONSHIP
         // PERTAINYM_RELATIONSHIP
         // DOMAIN_OF_SYNSET_TOPIC_RELATIONSHIP
