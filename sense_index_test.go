@@ -7,7 +7,7 @@ import (
 func TestLoadSenseIndex(t *testing.T) {
     dictDir, _ := GetWordNetDictDir()
     senseIndexFile := dictDir + "/index.sense"
-    senseIndex, err := loadSenseIndex(senseIndexFile)
+    senseIndex, err := loadSenseIndex(nil, senseIndexFile)
     if senseIndex == nil {
         t.Fatalf("Failed to load sense index: %v", err)
     }
@@ -18,7 +18,7 @@ func TestLoadSenseIndex(t *testing.T) {
     computer: {1  6 0 0 3086983 1 6} { NOUN, file: noun.artifact, lex_id: 0 head: , head_id: 0, synset_offset: 3086983, sense_number: 1, tag_cnt: 6 }
     computer: {1 18 0 0 9906486 2 0} { NOUN, file: noun.person,   lex_id: 0 head: , head_id: 0, synset_offset: 9906486, sense_number: 2, tag_cnt: 0 }
     */
-    computerLemmas, _ := (*senseIndex)["computer"]
+    computerLemmas, _ := senseIndex["computer"]
     if computerLemmas == nil || len(computerLemmas) == 0 {
         t.Fatalf("\"computer\" not found in sense index. Not loaded correctly?")
     }
@@ -65,7 +65,7 @@ func TestLoadSenseIndex(t *testing.T) {
     live%5:00:02:current:00 00670686 8 0
     live%5:00:07:active:05 00041710 11 0
     */
-    liveLemmas, _ := (*senseIndex)["live"]
+    liveLemmas, _ := senseIndex["live"]
     if liveLemmas == nil || len(liveLemmas) == 0 {
         t.Fatalf("\"live\" not found in sense index. Not loaded correctly?")
     }
@@ -100,7 +100,7 @@ func TestLoadSenseIndex(t *testing.T) {
     /*
     02408581 05 n 03 Aberdeen_Angus 0 Angus 0 black_Angus 0 001 @ 02406838 n 0000 | black hornless breed from Scotland
     */
-    angusLemmas, _ := (*senseIndex)["angus"]
+    angusLemmas, _ := senseIndex["angus"]
     t.Logf("angusLemmas = %v\n", angusLemmas)
     if angusLemmas == nil || len(angusLemmas) == 0 {
         t.Fatalf("\"angus\" not found in sense index. Not loaded correctly?")

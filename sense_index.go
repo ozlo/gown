@@ -34,6 +34,7 @@ type SenseIndexEntry struct {
     SynsetOffset int       // byte offset into <POS>.data file
     SenseNumber int        // sense number within the <POS>.data for the word
     TagCount int           // number of times the word was tagged in semantic concordance texts
+    synsetPtr *Synset      // back ponter to the underlying synset.
 }
 
 func (e *SenseIndexEntry) ToString() string {
@@ -64,7 +65,11 @@ func (e *SenseIndexEntry) ToString() string {
         e.TagCount)
 }
 
-func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
+func (e *SenseIndexEntry) GetSynsetPtr() *Synset {
+    return e.synsetPtr
+}
+
+func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
     index := senseIndex{}
 
     infile, err := os.Open(senseIndexFilename)
@@ -103,6 +108,11 @@ func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
         head_word := lex_sense_fields[3]                    // OPTIONAL lemma of the first word of the adjective satellite's head synset. (ss_type of this entry is 5)
         head_id, _ := strconv.Atoi(lex_sense_fields[4])     // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
 
+        var synsetPtr *Synset = nil
+        if wn != nil {
+            synsetPtr = wn.GetSynset(ss_type, synset_offset)
+        }
+
         newEntry := SenseIndexEntry {
             ss_type,
             lex_filenum,
@@ -112,6 +122,7 @@ func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
             synset_offset,
             sense_number,
             tag_cnt,
+            synsetPtr,
         }
 
         entries, exists := index[lemma]
@@ -123,5 +134,5 @@ func loadSenseIndex(senseIndexFilename string) (*senseIndex, error) {
         }
     }
 
-    return &index, nil
+    return index, nil
 }
