@@ -106,7 +106,7 @@ func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexE
 
 func (wn *WN) LookupWithPartOfSpeechAndSense(lemma string, pos int, senseId int) *SenseIndexEntry {
 	senses, _ := wn.senseIndex[lemma]
-	for _, sense := range senses {
+	for i, sense := range senses {
 		if (sense.PartOfSpeech == pos) && (sense.SenseNumber == senseId) {
 			return &sense
 		}
