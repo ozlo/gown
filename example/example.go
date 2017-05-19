@@ -13,15 +13,42 @@ func main() {
 		return
 	}
 
-	printLookup(wn, "live")
-	printLookupWithPartOfSpeech(wn, "computer", gown.POS_NOUN)
+	//printLookup(wn, "live")
+	//printLookupWithPartOfSpeech(wn, "computer", gown.POS_NOUN)
+	//printLookupWithPartOfSpeechAndSense(wn, "lemma", gown.POS_NOUN, 1)
+	//printLookupSensesWithPartOfSpeech(wn, "lemma", gown.POS_NOUN)
+	words := []string { "computer", "computing machine", "computing device", "data processor", "electronic computer", "information processing system" }
+	for _, word := range words {
+		printSenseIndexEntryAndSynset(wn, word, gown.POS_NOUN, 1)
+	}
+}
+
+func printSenseIndexEntryAndSynset(wn *gown.WN, word string, pos int, senseId int) {
+	senseIndexEntry := wn.LookupWithPartOfSpeechAndSense(word, pos, senseId)
+	printSenseIndexEntry(wn, senseIndexEntry)
+	//printSynsetPtr(wn, senseIndexEntry.GetSynsetPtr())
+}
+
+func printLookupSensesWithPartOfSpeech(wn *gown.WN, word string, pos int) {
+	fmt.Printf("\n===================\n\n")
+	fmt.Printf("Lookup %q\n", word)
+	for _, senseIndexEntry := range wn.LookupSensesWithPartOfSpeech(word, pos) {
+		printSenseIndexEntry(wn, senseIndexEntry)
+		fmt.Printf("\n")
+	}
+}
+
+
+func printLookupWithPartOfSpeechAndSense(wn *gown.WN, word string, pos int, senseId int) {
+	senseIndexEntry := wn.LookupWithPartOfSpeechAndSense(word, pos, senseId)
+	printSenseIndexEntry(wn, senseIndexEntry)
 }
 
 func printLookup(wn *gown.WN, word string) {
 	fmt.Printf("\n===================\n\n")
 	fmt.Printf("Lookup %q\n", word)
-	for resultId, senseIndexEntry := range wn.Lookup(word) {
-		printSenseIndexEntry(wn, resultId, senseIndexEntry)
+	for _, senseIndexEntry := range wn.Lookup(word) {
+		printSenseIndexEntry(wn, senseIndexEntry)
 		fmt.Printf("\n")
 	}
 }
@@ -42,16 +69,18 @@ func printLookupWithPartOfSpeech(wn *gown.WN, word string, pos int) {
 	}
 }
 
-func printSenseIndexEntry(wn *gown.WN, resultId int, senseIndexEntry *gown.SenseIndexEntry) {
-	fmt.Printf("\tresultId: %2d POS: (%d) %s TagCount: %d synsetOffset: %d\n",
-		resultId,
+func printSenseIndexEntry(wn *gown.WN, senseIndexEntry *gown.SenseIndexEntry) {
+	fmt.Printf("\t%s\n", senseIndexEntry.ToString())
+	/*
+	fmt.Printf("\tLexId: %d  POS: (%d) %s SenseNumber: %d TagCount: %d synsetOffset: %d\n",
+		senseIndexEntry.LexId,
 		senseIndexEntry.PartOfSpeech,
 		gown.PART_OF_SPEECH_ID_TO_STRING[senseIndexEntry.PartOfSpeech],
+		senseIndexEntry.SenseNumber,
 		senseIndexEntry.TagCount,
 		senseIndexEntry.SynsetOffset,
 	)
-	synsetPtr := wn.GetSynset(senseIndexEntry.PartOfSpeech, senseIndexEntry.SynsetOffset)
-	printSynsetPtr(wn, synsetPtr)
+	*/
 }
 
 func printSynsetPtr(wn *gown.WN, synsetPtr *gown.Synset) {
@@ -106,7 +135,7 @@ func printRelationship(wn *gown.WN, i int, relation gown.RelationshipEdge, srcWo
 			relation.TargetWordNumber,
 			targetWordNumber,
 			targetPtr.Words[targetWordNumber], star,
-			
+
 			relation)
 	} else {
 		fmt.Printf("NIL RELATION\n")

@@ -7,7 +7,7 @@ import (
 )
 
 type WN struct {
-	senseIndex  *senseIndex
+	senseIndex  senseIndex
 	PosIndicies map[int]*dataIndex
 	posData     map[int]*dataFile
 	exceptions  []map[string]string
@@ -53,18 +53,13 @@ func GetWordNetDictDir() (string, error) {
 }
 
 func LoadWordNet(dictDirname string) (*WN, error) {
-	wn := WN{
+	wn := &WN{
 		senseIndex:  nil,
 		PosIndicies: map[int]*dataIndex{},
 		posData:     map[int]*dataFile{},
 	}
 
 	var err error = nil
-	wn.senseIndex, err = loadSenseIndex(dictDirname + "/index.sense")
-	if err != nil {
-		return nil, err
-	}
-
 	pos_file_names := []string{"", "noun", "verb", "adj", "adv"}
 	for i := 1; i < len(pos_file_names); i++ {
 		wn.PosIndicies[i], err = readPosIndex(dictDirname + "/index." + pos_file_names[i])
@@ -77,7 +72,12 @@ func LoadWordNet(dictDirname string) (*WN, error) {
 		}
 	}
 
-	return &wn, nil
+	wn.senseIndex, err = loadSenseIndex(wn, dictDirname + "/index.sense")
+	if err != nil {
+		return nil, err
+	}
+
+	return wn, nil
 }
 
 func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
@@ -93,8 +93,29 @@ func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
 	}
 }
 
+func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexEntry {
+	senses, _ := wn.senseIndex[lemma]
+	ret := make([]*SenseIndexEntry, 0, len(senses))
+	for i, _ := range senses {
+		if senses[i].PartOfSpeech == pos {
+			ret = append(ret, &senses[i])
+		}
+	}
+	return ret
+}
+
+func (wn *WN) LookupWithPartOfSpeechAndSense(lemma string, pos int, senseId int) *SenseIndexEntry {
+	senses, _ := wn.senseIndex[lemma]
+	for _, sense := range senses {
+		if (sense.PartOfSpeech == pos) && (sense.SenseNumber == senseId) {
+			return &sense
+		}
+	}
+	return nil
+}
+
 func (wn *WN) Lookup(lemma string) []*SenseIndexEntry {
-	senseEntries, exists := (*wn.senseIndex)[strings.ToLower(lemma)]
+	senseEntries, exists := wn.senseIndex[strings.ToLower(lemma)]
 	if !exists {
 		return []*SenseIndexEntry{}
 	}
@@ -120,12 +141,12 @@ func (wn *WN) GetSynset(pos int, synsetOffset int) *Synset {
 	return &s
 }
 
-func (wn *WN) TraverseDataIndex(pos int) (out chan DataIndexPair) {
+func (wn *WN) TraverseDataIndex(pos int) <-chan DataIndexPair {
 	table, ok := wn.PosIndicies[pos]
 	if !ok {
 		return nil
 	}
-	out = make(chan DataIndexPair)
+	out := make(chan DataIndexPair)
 	go func() {
 		for k, v := range *table {
 			out <- DataIndexPair{k, v}
@@ -135,8 +156,8 @@ func (wn *WN) TraverseDataIndex(pos int) (out chan DataIndexPair) {
 	return out
 }
 
-func (wn *WN) Iter() <-chan Synset {
-	outChan := make(chan Synset)
+func (wn *WN) Iter() <-chan *Synset {
+	outChan := make(chan *Synset)
 	go func() {
 		for _, datFile := range wn.posData {
 			for _, synset := range *datFile {
@@ -152,7 +173,7 @@ func (wn *WN) Iter() <-chan Synset {
 				for i, w := range synset.Relationships {
 					edges[i] = w
 				}
-				outChan <- Synset{
+				outChan <- &Synset{
 					SynsetOffset:       synset.SynsetOffset,
 					LexographerFilenum: synset.LexographerFilenum,
 					PartOfSpeech:       synset.PartOfSpeech,
@@ -166,4 +187,17 @@ func (wn *WN) Iter() <-chan Synset {
 		close(outChan)
 	}()
 	return outChan
+}
+
+func (wn *WN) IterSenses() <-chan *SenseIndexEntry {
+	outchan := make(chan *SenseIndexEntry)
+	go func() {
+		for _, senses := range wn.senseIndex {
+			for i, _ := range senses {
+				outchan <- &senses[i]
+			}
+		}
+		close(outchan)
+	}()
+	return outchan
 }
