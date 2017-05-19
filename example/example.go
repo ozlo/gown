@@ -7,26 +7,30 @@ import (
 
 func main() {
 	dictDir, _ := gown.GetWordNetDictDir()
+	fmt.Printf("loading from %s\n", dictDir)
 	wn, err := gown.LoadWordNet(dictDir)
 	if err != nil {
 		fmt.Printf("can't load WordNet from %v: %v\n", dictDir, err)
 		return
 	}
 
-	//printLookup(wn, "live")
-	//printLookupWithPartOfSpeech(wn, "computer", gown.POS_NOUN)
-	//printLookupWithPartOfSpeechAndSense(wn, "lemma", gown.POS_NOUN, 1)
-	//printLookupSensesWithPartOfSpeech(wn, "lemma", gown.POS_NOUN)
+	printLookup(wn, "live")
+	printLookupWithPartOfSpeech(wn, "computer", gown.POS_NOUN)
+	printLookupWithPartOfSpeechAndSense(wn, "lemma", gown.POS_NOUN, 1)
+	printLookupSensesWithPartOfSpeech(wn, "lemma", gown.POS_NOUN)
+
 	words := []string { "computer", "computing machine", "computing device", "data processor", "electronic computer", "information processing system" }
 	for _, word := range words {
+		fmt.Printf("word: %s\n", word)
 		printSenseIndexEntryAndSynset(wn, word, gown.POS_NOUN, 1)
 	}
+
 }
 
 func printSenseIndexEntryAndSynset(wn *gown.WN, word string, pos int, senseId int) {
 	senseIndexEntry := wn.LookupWithPartOfSpeechAndSense(word, pos, senseId)
 	printSenseIndexEntry(wn, senseIndexEntry)
-	//printSynsetPtr(wn, senseIndexEntry.GetSynsetPtr())
+	printSynsetPtr(wn, senseIndexEntry.GetSynsetPtr())
 }
 
 func printLookupSensesWithPartOfSpeech(wn *gown.WN, word string, pos int) {
@@ -37,7 +41,6 @@ func printLookupSensesWithPartOfSpeech(wn *gown.WN, word string, pos int) {
 		fmt.Printf("\n")
 	}
 }
-
 
 func printLookupWithPartOfSpeechAndSense(wn *gown.WN, word string, pos int, senseId int) {
 	senseIndexEntry := wn.LookupWithPartOfSpeechAndSense(word, pos, senseId)
@@ -71,16 +74,6 @@ func printLookupWithPartOfSpeech(wn *gown.WN, word string, pos int) {
 
 func printSenseIndexEntry(wn *gown.WN, senseIndexEntry *gown.SenseIndexEntry) {
 	fmt.Printf("\t%s\n", senseIndexEntry.ToString())
-	/*
-	fmt.Printf("\tLexId: %d  POS: (%d) %s SenseNumber: %d TagCount: %d synsetOffset: %d\n",
-		senseIndexEntry.LexId,
-		senseIndexEntry.PartOfSpeech,
-		gown.PART_OF_SPEECH_ID_TO_STRING[senseIndexEntry.PartOfSpeech],
-		senseIndexEntry.SenseNumber,
-		senseIndexEntry.TagCount,
-		senseIndexEntry.SynsetOffset,
-	)
-	*/
 }
 
 func printSynsetPtr(wn *gown.WN, synsetPtr *gown.Synset) {

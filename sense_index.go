@@ -25,6 +25,7 @@ semantic concordance texts.
 
 type senseIndex map[string][]SenseIndexEntry
 type SenseIndexEntry struct {
+    Lemma string
     PartOfSpeech int       // POS tag. (e.g. POS_NOUN, ...)
     LexographerFilenum int // index into LEXOGRAPHER_FILE_NUM_TO_NAME
     LexId int              // identifies a sense within a lemma file (default is 0)
@@ -54,13 +55,14 @@ func (e *SenseIndexEntry) ToString() string {
         pos_str = "ADJ_SAT"
     }
 
-    return fmt.Sprintf("{ %s, file: %s, lex_id: %d head: %s, head_id: %d, synset_offset: %d, sense_number: %d, tag_cnt: %d }",
+    return fmt.Sprintf("{ %s, file: %s, lex_id: %d head: %s, head_id: %d, synset_offset: %d, lemma %q sense_number: %d, tag_cnt: %d }",
         pos_str,
         LEXOGRAPHER_FILE_NUM_TO_NAME[e.LexographerFilenum],
         e.LexId,
         e.HeadWord,
         e.HeadId,
         e.SynsetOffset,
+        e.Lemma,
         e.SenseNumber,
         e.TagCount)
 }
@@ -114,6 +116,7 @@ func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
         }
 
         newEntry := SenseIndexEntry {
+            lemma,
             ss_type,
             lex_filenum,
             lex_id,
