@@ -41,7 +41,7 @@ type DataIndexEntry struct {
     SynsetOffsets []int
 }
 
-type dataFile map[int]Synset
+type dataFile map[int]*Synset
 type Synset struct {
     SynsetOffset int
     LexographerFilenum int
@@ -80,7 +80,7 @@ func DataIndexIterator(di *dataIndex) <-chan DataIndexPair {
 // Reads a index.POS (e.g. index.noun, index.verb, etc.) file and populates
 // a dataIndex . The index format is:
 // lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
-func readPosIndex(posIndexFilename string) (*dataIndex, error) {
+func readPosIndex(posIndexFilename string) (dataIndex, error) {
     index := dataIndex{}
 
     infile, err := os.Open(posIndexFilename)
@@ -141,13 +141,13 @@ func readPosIndex(posIndexFilename string) (*dataIndex, error) {
         }
     }
 
-    return &index, nil
+    return index, nil
 }
 
 // Reads a data.POS (e.g. data.noun, data.verb, etc.) file and populates
 // a map of ints to dataIndexEntries. The data format is:
 // synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...]  [frames...]  |   gloss
-func readPosData(posDataFilename string) (*dataFile, error) {
+func readPosData(posDataFilename string) (dataFile, error) {
     data := dataFile{}
 
     infile, err := os.Open(posDataFilename)
@@ -227,7 +227,7 @@ func readPosData(posDataFilename string) (*dataFile, error) {
             gloss = ""
         }
 
-        data[synset_offset] = Synset {
+        data[synset_offset] = &Synset {
                 SynsetOffset: synset_offset,
                 LexographerFilenum: lex_filenum,
                 PartOfSpeech: ss_type,
@@ -238,5 +238,5 @@ func readPosData(posDataFilename string) (*dataFile, error) {
         }
     }
 
-    return &data, nil
+    return data, nil
 }

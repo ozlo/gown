@@ -23,7 +23,7 @@ synset containing the sense, and the number of times it has been tagged in the
 semantic concordance texts.
 */
 
-type senseIndex map[string][]SenseIndexEntry
+type senseIndex map[string][]*SenseIndexEntry
 type SenseIndexEntry struct {
     Lemma string
     PartOfSpeech int       // POS tag. (e.g. POS_NOUN, ...)
@@ -35,7 +35,7 @@ type SenseIndexEntry struct {
     SynsetOffset int       // byte offset into <POS>.data file
     SenseNumber int        // sense number within the <POS>.data for the word
     TagCount int           // number of times the word was tagged in semantic concordance texts
-    synsetPtr *Synset      // back ponter to the underlying synset.
+    SynsetPtr *Synset      // back ponter to the underlying synset.
 }
 
 func (e *SenseIndexEntry) ToString() string {
@@ -65,10 +65,6 @@ func (e *SenseIndexEntry) ToString() string {
         e.Lemma,
         e.SenseNumber,
         e.TagCount)
-}
-
-func (e *SenseIndexEntry) GetSynsetPtr() *Synset {
-    return e.synsetPtr
 }
 
 func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
@@ -115,7 +111,7 @@ func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
             synsetPtr = wn.GetSynset(ss_type, synset_offset)
         }
 
-        newEntry := SenseIndexEntry {
+        newEntry := &SenseIndexEntry {
             lemma,
             ss_type,
             lex_filenum,
@@ -130,7 +126,7 @@ func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
 
         entries, exists := index[lemma]
         if !exists {
-            index[lemma] = make([]SenseIndexEntry, 1)
+            index[lemma] = make([]*SenseIndexEntry, 1)
             index[lemma][0] = newEntry
         } else {
             index[lemma] = append(entries, newEntry)

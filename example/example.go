@@ -30,7 +30,7 @@ func main() {
 func printSenseIndexEntryAndSynset(wn *gown.WN, word string, pos int, senseId int) {
 	senseIndexEntry := wn.LookupWithPartOfSpeechAndSense(word, pos, senseId)
 	printSenseIndexEntry(wn, senseIndexEntry)
-	printSynsetPtr(wn, senseIndexEntry.GetSynsetPtr())
+	printSynsetPtr(wn, senseIndexEntry.SynsetPtr)
 }
 
 func printLookupSensesWithPartOfSpeech(wn *gown.WN, word string, pos int) {
