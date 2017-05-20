@@ -34,26 +34,26 @@ another via the synset_offset s.
 
 type dataIndex map[string]DataIndexEntry
 type DataIndexEntry struct {
-    PartOfSpeech int
-    SynsetCount int
-    Relationships []int
-    TagSenseCount int
-    SynsetOffsets []int
+    partOfSpeech int
+    synsetCount int
+    relationships []int
+    tagSenseCount int
+    synsetOffsets []int
 }
 func (die *DataIndexEntry) GetPartOfSpeech() int {
-    return die.PartOfSpeech
+    return die.partOfSpeech
 }
 func (die *DataIndexEntry) GetSynsetCount() int {
-    return die.SynsetCount
+    return die.synsetCount
 }
 func (die *DataIndexEntry) GetRelationships() []int {
-    return copyIntArray(die.Relationships)
+    return copyIntArray(die.relationships)
 }
 func (die *DataIndexEntry) GetTagSenseCount() int {
-    return die.TagSenseCount
+    return die.tagSenseCount
 }
 func (die *DataIndexEntry) GetSynsetOffsets() []int {
-    return copyIntArray(die.SynsetOffsets)
+    return copyIntArray(die.synsetOffsets)
 }
 
 type dataFile map[int]*Synset
@@ -174,11 +174,11 @@ func readPosIndex(posIndexFilename string) (dataIndex, error) {
             fmt.Printf("WARNING: %s already exists. Overwriting.\n", lemma)
         }
         index[lemma] = DataIndexEntry {
-            PartOfSpeech: pos_tag,
-            SynsetCount: synset_cnt,
-            Relationships: relationships,
-            TagSenseCount: tagsense_cnt,
-            SynsetOffsets: synsetOffsets,
+            partOfSpeech: pos_tag,
+            synsetCount: synset_cnt,
+            relationships: relationships,
+            tagSenseCount: tagsense_cnt,
+            synsetOffsets: synsetOffsets,
         }
     }
 
