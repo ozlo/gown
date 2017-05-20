@@ -6,7 +6,7 @@ import (
 )
 
 var (
-    LEXOGRAPHER_FILE_NUM_TO_NAME = []string{
+    cLexographerFileNumToName = []string{
         "adj.all",            // all adjective clusters
         "adj.pert",           // relational adjectives (pertainyms)
         "adv.all",            // all adverbs
@@ -54,7 +54,7 @@ var (
         "adj.ppl",            // participial adjectives
     }
 
-    RELATIONSHIP_POINTER_SYMBOLS = map[string]int {
+    cRelationshipPointerSymbols = map[string]int {
         // noun relationships
         "!": ANTONYM_RELATIONSHIP,
         "@": HYPERNYM_RELATIONSHIP,
@@ -109,7 +109,7 @@ var (
         // DOMAIN_OF_SYNSET_USAGE_RELATIONSHIP
     }
 
-    RELATIONSHIP_ID_TO_STRING = map[int]string {
+    cRelationshipIdToString = map[int]string {
         ANTONYM_RELATIONSHIP: "antonym",
         HYPERNYM_RELATIONSHIP: "hypernym",
         INSTANCE_HYPERNYM_RELATIONSHIP: "hypernym-instance",
@@ -139,7 +139,7 @@ var (
         PERTAINYM_RELATIONSHIP: "pertainym",
     }
 
-    PART_OF_SPEECH_ID_TO_STRING = []string {
+    cPartOfSpeechIdToString = []string {
       "unsupported",
       "noun",
       "verb",
@@ -147,8 +147,21 @@ var (
       "adv",
       "adj_sat",
     }
-
 )
+
+func PartOfSpeechToString(pos int ) string {
+    if pos < 0 {
+        pos = 0
+    }
+    if pos >= len(cPartOfSpeechIdToString) {
+        pos = 0
+    }
+    return cPartOfSpeechIdToString[pos]
+}
+
+func RelationshipIdToString(rel int) string {
+    return cRelationshipIdToString[rel]
+}
 
 // syntactic category / part of speech
 const POS_UNSUPPORTED int = 0
@@ -225,4 +238,20 @@ func oneCharPosTagToPosId(tag string) int {
     default:
         return POS_UNSUPPORTED
     }
+}
+
+func copyIntArray(a []int) []int {
+    ret := make([]int, len(a))
+    for i, e := range a {
+        ret[i] = e
+    }
+    return ret
+}
+
+func copyStringArray(a []string) []string {
+    ret := make([]string, len(a))
+    for i, e := range a {
+        ret[i] = e
+    }
+    return ret
 }
