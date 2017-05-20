@@ -97,7 +97,7 @@ func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexE
 	senses, _ := wn.senseIndex[lemma]
 	ret := make([]*SenseIndexEntry, 0, len(senses))
 	for i, _ := range senses {
-		if senses[i].partOfSpeech == pos {
+		if senses[i].PartOfSpeech == pos {
 			ret = append(ret, senses[i])
 		}
 	}
@@ -107,7 +107,7 @@ func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexE
 func (wn *WN) LookupWithPartOfSpeechAndSense(lemma string, pos int, senseId int) *SenseIndexEntry {
 	senses, _ := wn.senseIndex[lemma]
 	for _, sense := range senses {
-		if (sense.partOfSpeech == pos) && (sense.senseNumber == senseId) {
+		if (sense.PartOfSpeech == pos) && (sense.SenseNumber == senseId) {
 			return sense
 		}
 	}
