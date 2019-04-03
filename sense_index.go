@@ -25,47 +25,47 @@ semantic concordance texts.
 
 type senseIndex map[string][]*SenseIndexEntry
 type SenseIndexEntry struct {
-    Lemma string
-    PartOfSpeech int       // POS tag. (e.g. POS_NOUN, ...)
-    LexographerFilenum int // index into cLexographerFileNumToName
-    LexId int              // identifies a sense within a lemma file (default is 0)
-    HeadWord string        // OPTIONAL lemma of the first word of the adjective satellite's head synset. (PartOfSpeech of this entry is 5)
-    HeadId int             // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
+    lemma string
+    partOfSpeech int       // POS tag. (e.g. POS_NOUN, ...)
+    lexographerFilenum int // index into cLexographerFileNumToName
+    lexId int              // identifies a sense within a lemma file (default is 0)
+    headWord string        // OPTIONAL lemma of the first word of the adjective satellite's head synset. (PartOfSpeech of this entry is 5)
+    headId int             // OPTIONAL uniquely identifies head_word in a lexographer file. ( fmt.Sprintf("%s%2d", head_word, head_id) )
 
-    SynsetOffset int       // byte offset into <POS>.data file
-    SenseNumber int        // sense number within the <POS>.data for the word
-    TagCount int           // number of times the word was tagged in semantic concordance texts
+    synsetOffset int       // byte offset into <POS>.data file
+    senseNumber int        // sense number within the <POS>.data for the word
+    tagCount int           // number of times the word was tagged in semantic concordance texts
     synsetPtr *Synset      // back ponter to the underlying synset.
 }
 func (sei *SenseIndexEntry) GetLemma() string {
-    return sei.Lemma
+    return sei.lemma
 }
 func (sei *SenseIndexEntry) GetPartOfSpeech() int {
-    return sei.PartOfSpeech
+    return sei.partOfSpeech
 }
 func (sei *SenseIndexEntry) GetLexographerFilenum() int {
-    return sei.LexographerFilenum
+    return sei.lexographerFilenum
 }
 func (sei *SenseIndexEntry) GetLexographerFilename() string {
-    return cLexographerFileNumToName[sei.LexographerFilenum]
+    return cLexographerFileNumToName[sei.lexographerFilenum]
 }
 func (sei *SenseIndexEntry) GetLexId() int {
-    return sei.LexId
+    return sei.lexId
 }
 func (sei *SenseIndexEntry) GetHeadWord() string {
-    return sei.HeadWord
+    return sei.headWord
 }
 func (sei *SenseIndexEntry) GetHeadId() int {
-    return sei.HeadId
+    return sei.headId
 }
 func (sei *SenseIndexEntry) GetSynsetOffset() int {
-    return sei.SynsetOffset
+    return sei.synsetOffset
 }
 func (sei *SenseIndexEntry) GetSenseNumber() int {
-    return sei.SenseNumber
+    return sei.senseNumber
 }
 func (sei *SenseIndexEntry) GetTagCount() int {
-    return sei.TagCount
+    return sei.tagCount
 }
 func (sei *SenseIndexEntry) GetSynsetPtr() *Synset {
     return sei.synsetPtr
@@ -73,7 +73,7 @@ func (sei *SenseIndexEntry) GetSynsetPtr() *Synset {
 
 func (e *SenseIndexEntry) ToString() string {
     var pos_str string
-    switch(e.PartOfSpeech) {
+    switch(e.partOfSpeech) {
     case POS_UNSUPPORTED:
         pos_str = "UNSUPPORTED"
     case POS_NOUN:
@@ -90,14 +90,14 @@ func (e *SenseIndexEntry) ToString() string {
 
     return fmt.Sprintf("{ %s, file: %s, lex_id: %d head: %s, head_id: %d, synset_offset: %d, lemma %q sense_number: %d, tag_cnt: %d }",
         pos_str,
-        cLexographerFileNumToName[e.LexographerFilenum],
-        e.LexId,
-        e.HeadWord,
-        e.HeadId,
-        e.SynsetOffset,
-        e.Lemma,
-        e.SenseNumber,
-        e.TagCount)
+        cLexographerFileNumToName[e.lexographerFilenum],
+        e.lexId,
+        e.headWord,
+        e.headId,
+        e.synsetOffset,
+        e.lemma,
+        e.senseNumber,
+        e.tagCount)
 }
 
 func loadSenseIndex(wn *WN, senseIndexFilename string) (senseIndex, error) {
