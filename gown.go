@@ -8,8 +8,8 @@ import (
 
 type WN struct {
 	senseIndex  senseIndex
-	PosIndicies map[int]*dataIndex
-	posData     map[int]*dataFile
+	posIndicies map[int]dataIndex
+	posData     map[int]dataFile
 	exceptions  []map[string]string
 }
 
@@ -55,14 +55,14 @@ func GetWordNetDictDir() (string, error) {
 func LoadWordNet(dictDirname string) (*WN, error) {
 	wn := &WN{
 		senseIndex:  nil,
-		PosIndicies: map[int]*dataIndex{},
-		posData:     map[int]*dataFile{},
+		posIndicies: map[int]dataIndex{},
+		posData:     map[int]dataFile{},
 	}
 
 	var err error = nil
 	pos_file_names := []string{"", "noun", "verb", "adj", "adv"}
 	for i := 1; i < len(pos_file_names); i++ {
-		wn.PosIndicies[i], err = readPosIndex(dictDirname + "/index." + pos_file_names[i])
+		wn.posIndicies[i], err = readPosIndex(dictDirname + "/index." + pos_file_names[i])
 		if err != nil {
 			return nil, err
 		}
@@ -81,11 +81,11 @@ func LoadWordNet(dictDirname string) (*WN, error) {
 }
 
 func (wn *WN) LookupWithPartOfSpeech(lemma string, pos int) *DataIndexEntry {
-	posIndexPtr, exists := wn.PosIndicies[pos]
+	posIndexPtr, exists := wn.posIndicies[pos]
 	if !exists {
 		return nil
 	}
-	sn, exists := (*posIndexPtr)[strings.ToLower(lemma)]
+	sn, exists := posIndexPtr[strings.ToLower(lemma)]
 	if exists {
 		return &sn
 	} else {
@@ -97,8 +97,8 @@ func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexE
 	senses, _ := wn.senseIndex[lemma]
 	ret := make([]*SenseIndexEntry, 0, len(senses))
 	for i, _ := range senses {
-		if senses[i].PartOfSpeech == pos {
-			ret = append(ret, &senses[i])
+		if senses[i].partOfSpeech == pos {
+			ret = append(ret, senses[i])
 		}
 	}
 	return ret
@@ -107,23 +107,16 @@ func (wn *WN) LookupSensesWithPartOfSpeech(lemma string, pos int) []*SenseIndexE
 func (wn *WN) LookupWithPartOfSpeechAndSense(lemma string, pos int, senseId int) *SenseIndexEntry {
 	senses, _ := wn.senseIndex[lemma]
 	for _, sense := range senses {
-		if (sense.PartOfSpeech == pos) && (sense.SenseNumber == senseId) {
-			return &sense
+		if (sense.partOfSpeech == pos) && (sense.senseNumber == senseId) {
+			return sense
 		}
 	}
 	return nil
 }
 
 func (wn *WN) Lookup(lemma string) []*SenseIndexEntry {
-	senseEntries, exists := wn.senseIndex[strings.ToLower(lemma)]
-	if !exists {
-		return []*SenseIndexEntry{}
-	}
-	ret := make([]*SenseIndexEntry, len(senseEntries))
-	for i, _ := range senseEntries {
-		ret[i] = &senseEntries[i]
-	}
-	return ret
+	senseEntries, _ := wn.senseIndex[strings.ToLower(lemma)]
+	return senseEntries
 }
 
 func (wn *WN) GetSynset(pos int, synsetOffset int) *Synset {
@@ -134,54 +127,16 @@ func (wn *WN) GetSynset(pos int, synsetOffset int) *Synset {
 	if !exists || idxPtr == nil {
 		return nil
 	}
-	s, exists := (*idxPtr)[synsetOffset]
-	if !exists {
-		return nil
-	}
-	return &s
-}
-
-func (wn *WN) TraverseDataIndex(pos int) <-chan DataIndexPair {
-	table, ok := wn.PosIndicies[pos]
-	if !ok {
-		return nil
-	}
-	out := make(chan DataIndexPair)
-	go func() {
-		for k, v := range *table {
-			out <- DataIndexPair{k, v}
-		}
-		close(out)
-	}()
-	return out
+	s, _ := idxPtr[synsetOffset]
+	return s
 }
 
 func (wn *WN) Iter() <-chan *Synset {
 	outChan := make(chan *Synset)
 	go func() {
 		for _, datFile := range wn.posData {
-			for _, synset := range *datFile {
-				words := make([]string, len(synset.Words))
-				for i, w := range synset.Words {
-					words[i] = w
-				}
-				lexids := make([]int, len(synset.LexIds))
-				for i, w := range synset.LexIds {
-					lexids[i] = w
-				}
-				edges := make([]RelationshipEdge, len(synset.Relationships))
-				for i, w := range synset.Relationships {
-					edges[i] = w
-				}
-				outChan <- &Synset{
-					SynsetOffset:       synset.SynsetOffset,
-					LexographerFilenum: synset.LexographerFilenum,
-					PartOfSpeech:       synset.PartOfSpeech,
-					Words:              words,
-					LexIds:             lexids,
-					Relationships:      edges,
-					Gloss:              synset.Gloss,
-				}
+			for _, synset := range datFile {
+				outChan <- synset
 			}
 		}
 		close(outChan)
@@ -193,11 +148,33 @@ func (wn *WN) IterSenses() <-chan *SenseIndexEntry {
 	outchan := make(chan *SenseIndexEntry)
 	go func() {
 		for _, senses := range wn.senseIndex {
-			for i, _ := range senses {
-				outchan <- &senses[i]
+			for _, sense := range senses {
+				outchan <- sense
 			}
 		}
 		close(outchan)
 	}()
 	return outchan
+}
+
+type DataIndexPair struct {
+    Lexeme string
+    IndexEntry *DataIndexEntry
+}
+func (wn *WN) IterDataIndex(pos int) <-chan DataIndexPair {
+	table, ok := wn.posIndicies[pos]
+	if !ok {
+		return nil
+	}
+	out := make(chan DataIndexPair)
+	go func() {
+		for k, v := range table {
+			out <- DataIndexPair {
+				Lexeme: k,
+				IndexEntry: &v,
+			}
+		}
+		close(out)
+	}()
+	return out
 }

@@ -125,7 +125,7 @@ func TestIterate(t *testing.T) {
     i := 0
     for synset := range wn.Iter() {
         if i < atLeast {
-            for _, _ = range synset.Words {
+            for _, _ = range synset.GetWords() {
                 i++
                 if i == atLeast {
                     break

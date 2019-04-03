@@ -61,11 +61,11 @@ func printLookupWithPartOfSpeech(wn *gown.WN, word string, pos int) {
 	fmt.Printf("LookupWithPartOfSpeech %q %d\n", word, pos)
 	dataIndexEntry := wn.LookupWithPartOfSpeech(word, pos)
 	if dataIndexEntry == nil {
-		fmt.Printf("Can't found a \"%s\" as a %s!\n", word, gown.PART_OF_SPEECH_ID_TO_STRING[pos])
+		fmt.Printf("Can't found a \"%s\" as a %s!\n", word, gown.PartOfSpeechToString(pos))
 	} else {
-		fmt.Printf("%s (%s)\n", word, gown.PART_OF_SPEECH_ID_TO_STRING[pos])
+		fmt.Printf("%s (%s)\n", word, gown.PartOfSpeechToString(pos))
 		fmt.Printf("%v\n", *dataIndexEntry)
-		for _, synsetOffset := range dataIndexEntry.SynsetOffsets {
+		for _, synsetOffset := range dataIndexEntry.GetSynsetOffsets() {
 			printSynsetPtr(wn, wn.GetSynset(pos, synsetOffset))
 			fmt.Printf("\n")
 		}
@@ -80,54 +80,54 @@ func printSynsetPtr(wn *gown.WN, synsetPtr *gown.Synset) {
 	if synsetPtr == nil {
 		fmt.Printf("\tNO SYNSET!\n")
 	} else {
-		fmt.Printf("\tGloss: %s\n", synsetPtr.Gloss)
+		fmt.Printf("\tGloss: %s\n", synsetPtr.GetGloss())
 		fmt.Printf("\tLexFile: %s POS: %s\n",
-			gown.LEXOGRAPHER_FILE_NUM_TO_NAME[synsetPtr.LexographerFilenum],
-			gown.PART_OF_SPEECH_ID_TO_STRING[synsetPtr.PartOfSpeech])
+			synsetPtr.GetLexographerFilename(),
+			gown.PartOfSpeechToString(synsetPtr.GetPartOfSpeech()))
 
 		fmt.Printf("\twords:")
-		for i, word := range synsetPtr.Words {
-			fmt.Printf(" %s (%d)", word, synsetPtr.LexIds[i])
+		for i, word := range synsetPtr.GetWords() {
+			fmt.Printf(" %s (%d)", word, synsetPtr.GetLexIds()[i])
 		}
 		fmt.Printf("\n")
 
 		fmt.Printf("\trelations:\n")
-		for i, relation := range synsetPtr.Relationships {
-			printRelationship(wn, i, relation, synsetPtr.Words)
+		for i, relation := range synsetPtr.GetRelationships() {
+			printRelationship(wn, i, relation, synsetPtr.GetWords())
 		}
 	}
 }
 
 func printRelationship(wn *gown.WN, i int, relation gown.RelationshipEdge, srcWords []string) {
-	fmt.Printf("\t\t%d: %s (%d) >> ", i, gown.RELATIONSHIP_ID_TO_STRING[relation.RelationshipType], relation.RelationshipType)
-	targetPtr := wn.GetSynset(relation.PartOfSpeech, relation.SynsetOffset)
+	fmt.Printf("\t\t%d: %s (%d) >> ", i, gown.RelationshipIdToString(relation.GetRelationshipType()), relation.GetRelationshipType())
+	targetPtr := wn.GetSynset(relation.GetPartOfSpeech(), relation.GetSynsetOffset())
 	if targetPtr != nil {
-		srcWordNumber := relation.SourceWordNumber
+		srcWordNumber := relation.GetSourceWordNumber()
 		if srcWordNumber > 0 {
 			srcWordNumber-- // make it zero based
 		}
-		targetWordNumber := relation.TargetWordNumber
+		targetWordNumber := relation.GetTargetWordNumber()
 		if targetWordNumber > 0 {
 			targetWordNumber-- // make it zero based
 		}
 
 		star := ""
-		if relation.SourceWordNumber == 0 && relation.TargetWordNumber == 0 {
+		if relation.GetSourceWordNumber() == 0 && relation.GetTargetWordNumber() == 0 {
 			star = "*"
 		}
 
 		fmt.Printf("%s (%d) %v  (%d:%d:%s%s -> %d:%d:%s%s) {{%v}}\n",
-			gown.PART_OF_SPEECH_ID_TO_STRING[relation.PartOfSpeech],
-			relation.SynsetOffset,
-			targetPtr.Words,
+			gown.PartOfSpeechToString(relation.GetPartOfSpeech()),
+			relation.GetSynsetOffset(),
+			targetPtr.GetWords(),
 
-			relation.SourceWordNumber,
+			relation.GetSourceWordNumber(),
 			srcWordNumber,
 			srcWords[srcWordNumber], star,
 
-			relation.TargetWordNumber,
+			relation.GetTargetWordNumber(),
 			targetWordNumber,
-			targetPtr.Words[targetWordNumber], star,
+			targetPtr.GetWords()[targetWordNumber], star,
 
 			relation)
 	} else {
